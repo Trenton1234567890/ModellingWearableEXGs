@@ -179,7 +179,7 @@ def mode_load(sites, D, pt: geo.Point, mode: str, p) -> ModeLoad:
     n_onbody = n_total = 0
     tx_bits = 0.0
     for h, (n_ind, n_rep) in assign.items():
-        need = p["analysis_mem_base_kB"] + mem_lead * n_ind
+        need = p["analysis_mem_base_kB"] + mem_lead * n_ind / p["buf_ratio"]   # A-10: lossless buffer compression
         cyc = p["W_lead"] * n_rep + (p["W_root"] if h == pt.root else 0)
         fits = (need <= cap_kB) and (cyc <= fcap)
         L.head_mem_kB[h], L.head_fits[h] = need, fits
