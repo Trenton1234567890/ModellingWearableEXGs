@@ -287,6 +287,7 @@ class LinkLevel:
     max_path_cm: float = 0.0
     bridges: int = 0              # single-link faults that disconnect something
     links: int = 0
+    per_src: dict = field(default_factory=dict)   # source site index -> (path_cm, hops)
 
 
 def link_level(D: np.ndarray, members: list[int], sink: int, topo: str) -> LinkLevel:
@@ -299,7 +300,8 @@ def link_level(D: np.ndarray, members: list[int], sink: int, topo: str) -> LinkL
         return LinkLevel()
     if topo == "star":
         d = Dsub[s]
-        return LinkLevel(float(d.sum()), float(d.sum()), m - 1, float(d.max()), m - 1, m - 1)
+        ps = {idx[t]: (float(d[t]), 1) for t in range(m) if t != s}
+        return LinkLevel(float(d.sum()), float(d.sum()), m - 1, float(d.max()), m - 1, m - 1, ps)
     if topo == "bus":
         # multidrop chain from the sink; every bit charges the whole bus
         rem = [i for i in range(m) if i != s]
@@ -309,18 +311,22 @@ def link_level(D: np.ndarray, members: list[int], sink: int, topo: str) -> LinkL
             length += Dsub[cur, j]
             cur = j
             rem.remove(j)
-        return LinkLevel(length, length * (m - 1), m - 1, length, 1, m - 1)
+        ps = {idx[t]: (float(length), 1) for t in range(m) if t != s}   # multidrop: whole bus per bit
+        return LinkLevel(length, length * (m - 1), m - 1, length, 1, m - 1, ps)
     if topo == "mesh":
         A = _mesh_edges(Dsub)
         dist, pred = dijkstra(csr_matrix(A), directed=False, indices=s, return_predecessors=True)
-        hops = 0
+        hops, ps = 0, {}
         for t in range(m):
-            v = t
+            v, h = t, 0
             while v != s and v >= 0:
                 v = pred[v]
-                hops += 1
+                h += 1
+            hops += h
+            if t != s:
+                ps[idx[t]] = (float(dist[t]), h)
         return LinkLevel(float(A.sum() / 2), float(dist.sum()), hops, float(dist.max()),
-                         _bridges(A), int((A > 0).sum() // 2))
+                         _bridges(A), int((A > 0).sum() // 2), ps)
     raise ValueError(topo)
 
 
@@ -372,6 +378,7 @@ def build_point(g: Garment, sites: list[Site], D: np.ndarray, m: int, n: int,
         for f in ("yarn_cm", "bitm_cm", "hops", "bridges", "links"):
             setattr(intra_tot, f, getattr(intra_tot, f) + getattr(lv, f))
         intra_tot.max_path_cm = max(intra_tot.max_path_cm, lv.max_path_cm)
+        intra_tot.per_src.update(lv.per_src)
     inter_lv = link_level(D, heads, root, inter)
 
     # Lead locality
