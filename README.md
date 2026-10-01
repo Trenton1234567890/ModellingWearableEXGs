@@ -8,7 +8,7 @@ A first-order analytical model of architectures for garment-integrated ECG. It c
 
 The question it answers: **for a given application, chiplet and radio, does distributing acquisition and compute across the garment beat a centralized design, and by how much?**
 
-The model is deliberately first-order. Every number and modelling choice is logged with a status (decision / standard / literature / derived / assumed / TBD) in [`ASSUMPTIONS.md`](ASSUMPTIONS.md), and the equations are collected in [`EQUATIONS.md`](EQUATIONS.md).
+The model is deliberately first-order. Every number and modelling choice is logged with a status (decision / standard / literature / derived / assumed / TBD) in [`Assumptions.md`](Assumptions.md), and the equations are collected in [`Equations.md`](Equations.md).
 
 ---
 
@@ -27,7 +27,9 @@ area heads ──digital──► root orchestrator (fusion, export decision, of
 | Topology | star, multidrop bus, or mesh (sensor node → head); star or mesh (head → root) |
 | Layout | Mason-Likar torso or sleeve limb leads; 10 12-lead sites + spares + a 54-site grid on a torso + sleeves cylinder model |
 | Export policy | raw, compressed, or on-body analysis (limited by chiplet SRAM and clock) |
-| Schedule | default (R-R plus hourly 12-lead plus daily BSPM), continuous 12-lead, continuous BSPM |
+| Schedule | default (R-R plus hourly 12-lead plus daily BSPM), continuous 12-lead, continuous BSPM, overnight BSPM shirt |
+| Windows | tunable per mode: R-R 2 s, 12-lead 10 s, BSPM 10–600 s; BSPM analysis can store or stream |
+| Chiplet IO | pad budget per chiplet (THReaD ≈ 9 IO) checked against electrodes + link ports |
 
 ---
 
@@ -44,8 +46,10 @@ area heads ──digital──► root orchestrator (fusion, export decision, of
 | `03_signal_quality.ipynb` | Stage 4: CMR validation, gain/skew spec map, input-capacitance and guarding requirements |
 | `04_onbody_processing.ipynb` | On-garment processing vs. distribution, SRAM crossover |
 | `05_regime_map.ipynb` | Regime map (SRAM × analysis window) and closed-form check |
-| `ASSUMPTIONS.md` | Assumptions log; newest changes first, with superseded entries kept |
-| `EQUATIONS.md` | Every equation the model uses, with assumption IDs |
+| `06_scaling_lead_count.ipynb` | Scaling from 52 to 269 electrodes: IO pads per chiplet, BSPM memory, overnight-shirt power |
+| `07_radio_and_flip_sensitivity.ipynb` | Radio energy sweep (3–200 nJ/b), its regime map, breakeven, and the parameters that can flip the architecture choice |
+| `Assumptions.md` | Assumptions log; newest changes first, with superseded entries kept |
+| `Equations.md` | Every equation the model uses, with assumption IDs |
 | `*.csv`, `*.png` | Outputs written by the notebooks |
 
 ---
@@ -97,12 +101,20 @@ print(sq.mode_metric(rej, "12L", p))
    - At 32 kB with a 10 s window, m = 4, n = 1 needs 1.07 mW against 4.7 mW centralized (4.4×).
    - At ≥ 96 kB, centralized wins again.
 
+6. **Scaling with lead count.**
+   - A centralized textile chiplet needs N + 2 IO pads (54–271), and its BSPM streaming memory grows with N (65–390 kB).
+   - Distributed designs need constant per-chiplet pads (6–14) and memory (14–32 kB).
+   - Overnight BSPM is 7–8× lower power when distributed. Closing the 7-day budget requires AFE ≤ ~0.5 µW/ch and sensor-node overhead ≤ ~2 µW.
+
+7. **Radio energy decides the 12-lead case.** For continuous 12-lead at 32 kB, distribution wins above about 24 nJ/b (lossy export) or about 6 nJ/b (lossless record). At about 3 nJ/b, centralized streaming wins. Near the crossover, many unmeasured parameters can flip the choice (see `flip_sensitivity.csv`).
+
 ### Known weak points
 - SRAM retention leakage per kB and lossless ECG compression ratios are uncited (A-07, A-10).
 - The analysis window per application is not yet tied to clinical requirements.
 - The AFE power model is not coupled to the input-capacitance requirement.
 - Sync, calibration and guard-driver power are not modelled.
-- Motion artifacts are scoped out.
+- Motion artifacts are scoped out (a future Stage 6).
+- The form-factor premise (no puck or battery-pod hub; A-12) is stated as a product requirement.
 - The R-R rejection target (60 dB) is a placeholder.
 
 ---

@@ -12,6 +12,11 @@ The parameter values live in `ecg_arch_model/params.py`; this log records the re
 
 | Date | ID | Change |
 |---|---|---|
+| 2026-10-01 | P-18 | **Radio energy is now swept from 3 to 200 nJ/b** (baseline stays 200). Results in notebook 07. For continuous 12-lead at 32 kB / 10 s, the crossover is about 24 nJ/b with lossy export and about 6 nJ/b with a lossless record. A flip-sensitivity analysis now identifies which assumptions can change the architecture choice. |
+| 2026-10-01 | A-05, A-13, A-14, A-06 | **Windows are tunable per mode and implemented in code:** T_win_rr (2 s), T_win_12L (10 s, range 2–30), T_win_bspm (10 s default, range 10–600). BSPM analysis can now *store* the window or *stream* (~1.5 kB/lead). The diagnostic-lossless option (A-13) keeps the 12-lead buffer and its exports lossless at 2.5× (off by default). BSPM has its own abnormal fraction. All defaults reproduce the earlier results. |
+| 2026-10-01 | H-15, G-11 | **IO-pad model added.** Pads per chiplet = electrode inputs + 2 per link port, with mesh ports capped at 4 by the router. The pad budget is a spec knob (THReaD: about 9 IO). A grid-pitch option scales the layout from 52 to 269 electrodes. |
+| 2026-10-01 | A-09 | Added the sleepBSPM schedule: BSPM runs back-to-back for sleep_hours (8 h), with R-R the rest of the time. |
+| 2026-10-01 | A-05, A-12, M-06 | **User decisions; code still pending.** Analysis windows per application: R-R 2 s (R-R intervals run 0.6–1.2 s), 12-lead 10 s (standard clinical record), BSPM up to 10 min (overnight sleep-shirt use). Added the form-factor premise A-12: no puck and no battery-pod hub, because a centralized chip for 200+ leads would need very large area and memory. Motion artifacts are deferred to a future Stage 6. |
 | 2026-10-01 | A-10, A-11 | Added a lossless buffer-compression knob r (default 1, swept 1–3). Added the closed-form regime rule; it matches 220 of 220 sweep cells. |
 | 2026-10-01 | A-01 – A-09 | **On-garment processing added (user request).** Every architecture now uses the same export policy (raw, compressed or onbody). Whether a given orchestrator can do the analysis depends on per-chiplet SRAM (32 kB) and clock (4 MHz) caps; if it can't, that head falls back to compressed streaming. Lead assignment uses a WCT broadcast to area heads. Retained-SRAM leakage is added to every orchestrator floor. Two continuous schedules were added. |
 | 2026-10-01 | A-08 | **Bug fix.** Compressed and raw capture streams were previously transmitted during the 15 s warm-up as well as the capture, which inflated TX about 2.5× for captures. Battery TX in the default schedule drops from 87 to 62 µW; Stage 3 numbers were re-run. |
@@ -113,6 +118,7 @@ The parameter values live in `ecg_arch_model/params.py`; this log records the re
 | G-07 | Precordial placement tolerance is 2 cm (the error that visibly alters morphology). A citation is still needed. | [assumed] |
 | G-08 | Minimum spacing for a usable local bipolar R-R lead is 5 cm (range 3–10). | [assumed] |
 | G-09 | Spares: 1 per 12-lead site by default (range 0–4), offset 1.5 cm, lateral first and then vertical, all inside the tolerance. | [decision] |
+| G-11 | Lead-count scaling: the `grid_pitch` option builds a regular grid at the given pitch over the same front region (x −21…21, y 6…44) and back region (x C/2 ± 18, y 8…42). Grid points within max(pitch/2, 2 cm) of a 12-lead site are dropped. Pitches of 10, 7, 5, 4 and 3.5 cm give 52, 88, 146, 217 and 269 sites (including the 10 12-lead sites and their spares). | [decision] |
 | G-10 | Electrodes are passive. The AFE sits at the sensor node, except at m = 1, which is an active electrode. | [decision] |
 
 ### H — Architecture hierarchy
@@ -131,6 +137,7 @@ The parameter values live in `ecg_arch_model/params.py`; this log records the re
 | H-11 | Sensor chiplets have no processor. Each active node streams raw samples to its area head. A lead is formed at the head when all its electrodes are in one area, and at the root otherwise, with the heads forwarding raw data. | [decision] |
 | H-12 | In 12-lead and BSPM modes, all leads are formed at the root, unless every active node sits in a single area, in which case they are formed at that area's head. | [decision] |
 | H-13 | R-R mode activates `rr_leads` (default 2) local leads, on the nodes nearest the root whose electrodes are ≥ 5 cm apart. If no node can form a local lead (m = 1), it uses pairs of active-electrode nodes nearest the root that are ≥ 5 cm apart. Each local lead is one differential channel. | [decision] |
+| H-15 | **IO pads per chiplet.** Sensor chiplet pads = electrodes terminated (including spares and RL) + 2 × link ports. Orchestrator pads = 2 × link ports. Star and bus links need dedicated ports. Mesh links share one router whose ports are capped at 4 (N/E/S/W), with extra adjacency reached by forwarding. The co-located sensor node joins the head's port pool. Power and ground pads are not counted. The pad budget `chiplet_io_pads` is 9 (THReaD: 8–9 usable IO), range 8–32, and is treated as a spec knob for future chiplets. | [decision] / [lit] |
 | H-14 | Spares are powered off (counted at off-state power) unless substituting. Substitution events are not yet modelled in the power model. | [decision] |
 
 ### P — Power parameters
@@ -153,7 +160,7 @@ The parameter values live in `ecg_arch_model/params.py`; this log records the re
 | P-15 | AFE power per channel ranges 0.45–212 µW across the literature. Baselines are set in P-20 and P-21. | [lit] |
 | P-16 | On-node processing energy is anchored to Ji '26 at 0.19 µJ per beat inference. | [lit] |
 | P-17 | Superseded by P-24. | — |
-| P-18 | Off-body TX: UWB is 88 pJ/b (Warchall '19). BLE is 200 nJ/b (range 50–1250). That is the best case from Siekkinen '12 on the CC2540 (100–600 kB/J, or 0.21–1.25 µJ/bit); modern SoCs are likely lower. | [lit] |
+| P-18 | Off-body radio energy per bit: baseline 200 nJ/b, swept 3–200 nJ/b. The literature spans about 3 nJ/b (best-case modern low-power radios, typically without protocol and connection overhead) to about 200 nJ/b (Siekkinen '12, BLE on the CC2540 with overhead, best case of 0.21–1.25 µJ/b). UWB is 88 pJ/b (Warchall '19). The BLE connection floor (P-29) is held fixed at 20 µW while energy per bit is swept. | [lit] |
 | P-19 | Raw 12-lead traffic to the root is about 80 kbps (10 channels × 500 S/s × 16 bits). | [derived] |
 | P-20 | Diagnostic-grade AFE is 5 µW per channel (range 0.5–20), anchored to the 4.6 µW two-electrode AFE (JSSC '25). It is used for 12-lead and BSPM. | [assumed] |
 | P-21 | Monitor-grade AFE is 1 µW per channel (range 0.5–20). It is used for R-R. | [assumed] |
@@ -186,13 +193,16 @@ The parameter values live in `ecg_arch_model/params.py`; this log records the re
 | A-02 | On-body analysis of a capture outputs, per orchestrator that fits: 12-lead, 512 b of features per lead reported; BSPM, a beat-averaged template per lead (0.6 s × fs × 16 b). Abnormal captures are additionally sent in full (compressed). An orchestrator that doesn't fit streams its leads compressed instead (per-head fallback). | [decision] / [assumed] |
 | A-03 | Every orchestrator chiplet, including the centralized one, has an SRAM cap of 32 kB (THReaD class; swept 8–256 kB). A puck-sized hub with no cap is not allowed, following the CCI proposal's form factor. | [decision] |
 | A-04 | Every orchestrator chiplet has a 4 MHz clock cap (range 1–50) for low-power operation. In practice memory binds first. | [assumed] |
-| A-05 | Analysis memory is 10 kB per independent lead (a 10 s window × 500 S/s × 16 b, which matches the standard 12-lead record length) plus 8 kB base for program, state and fusion. The window is swept 2–10 s. | [decision] |
-| A-06 | Abnormal-capture fraction p_abnormal = 5% (range 1–50%). | [decision] |
+| A-05 | Analysis memory = window × fs × 16 b per independent lead (≈ T kB at 500 S/s), plus 8 kB base. Windows are tunable per mode: **T_win_rr** = 2 s (R-R intervals are 0.6–1.2 s), **T_win_12L** = 10 s (standard clinical record; Cleveland Clinic; range 2–30), **T_win_bspm** = 10 s default (range 10–600; under 1 min if ideal, up to 10 min for overnight sleep-shirt use). The capture length equals the window. | [decision] |
+| A-13 | Diagnostic-lossless option (`diag_lossless`, off by default). When on, the 12-lead store-then-decide buffer **and** every exported 12-lead capture (abnormal, fallback or compressed policy) use lossless_ratio = 2.5 (range 1.5–3; needs a citation) instead of 4:1 lossy. This keeps buffering and export consistent for a diagnostic record. | [decision] / [assumed] |
+| A-14 | BSPM analysis mode: `store` buffers the whole window (T_win_bspm × 1 kB per lead / buf_ratio); `stream` keeps a beat-averaged running state of 1.5 kB per lead (range 0.5–4), independent of the window. Default `store` reproduces the earlier results; `stream` is the realistic choice for long windows. | [decision] / [assumed] |
+| A-12 | **Form-factor premise:** there is no puck and no battery-pod hub. Rationale: a single chip serving 200+ leads would need very large area and memory, and puck-based systems are uncomfortable. Storage and compute for whole-garment ExG must therefore be distributed. This premise is stated explicitly in the paper, and a battery-pod baseline is shown only for contrast. | [decision] |
+| A-06 | Abnormal-capture fraction: p_abnormal = 5% for 12-lead (range 1–50%). p_abnormal_bspm = 5% for BSPM (range 0–50%), where 0 means templates only. | [decision] / [assumed] |
 | A-07 | Retained SRAM leakage is 0.1 µW/kB (range 0.02–1), added to every orchestrator floor as leakage × SRAM cap (3.2 µW at 32 kB). This value needs a citation. | [assumed] |
 | A-08 | Lead assignment for on-body analysis. Each independent lead goes to the head of the area holding its electrode. The 12-lead limb group (I and II buffered, the others derived) goes to the head holding RA. Heads other than RA's receive a WCT broadcast of RA, LA and LL (3 × fs × 16 b) over the inter-area links. Streams are counted only during the capture, not the warm-up. | [decision] |
 | A-10 | The analysis buffer can be compressed losslessly by r (default 1, range 1–3). Lossless ECG coders reach about 2–3×; this needs a citation. | [assumed] |
 | A-11 | Closed-form regime rule. A head holding L independent leads fits if M_base + L·T/r ≤ S. The winner is the fewest-SoC architecture whose largest per-head load L_max fits. If none fits but M_base + T/r ≤ S, the finest architecture wins by fitting partially. Otherwise everything streams and centralized wins. Checked against 220 of 220 cells for continuous 12-lead. | [derived] |
-| A-09 | Schedules. default: as in X-07. cont12L: 12-lead continuously, as back-to-back 10 s windows with no warm-up. contBSPM: BSPM continuously. | [decision] |
+| A-09 | Schedules. sleepBSPM: BSPM back-to-back for sleep_hours = 8 h/day (range 4–10), with R-R otherwise and no warm-up between windows. Other schedules: default: as in X-07. cont12L: 12-lead continuously, as back-to-back 10 s windows with no warm-up. contBSPM: BSPM continuously. | [decision] |
 
 ### V — Validation and publication
 | ID | Assumption | Status |
@@ -219,4 +229,5 @@ The parameter values live in `ecg_arch_model/params.py`; this log records the re
 | S-10 | Q-03: yarn coupling to the body vs. to ground was unresolved. | Q-03: split into line-to-body and line-to-ground C. | 2026-10-01 |
 | S-11 | Q-08: realistic V_cm was TBD. | Q-08: not needed (rejection-ratio formulation). | 2026-10-01 |
 | S-12 | Q-07: "≤ ~9 µs with 40 dB" from a back-of-envelope estimate. | Q-07: ≲ 10 µs and ≲ 0.35% gain, from the model. | 2026-10-01 |
+| S-14 | Fixed parameters t_12lead_capture, t_bspm_capture and analysis_mem_kB_lead. | A-05: per-mode windows T_win_*, with memory derived from the window. | 2026-10-01 |
 | S-13 | X-06: export rates fixed per mode, identical for all architectures, with captures streamed during warm-up. | A-01 – A-09: an export policy limited by chiplet capacity; streaming counted only during the capture. | 2026-10-01 |

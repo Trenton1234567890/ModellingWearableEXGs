@@ -1,6 +1,6 @@
 # Model Equations Reference
 
-These are the equations the architecture model actually uses, grouped by stage. Bracketed IDs point to `ASSUMPTIONS.md`; the code module is given for each stage.
+These are the equations the architecture model actually uses, grouped by stage. Bracketed IDs point to `Assumptions.md`; the code module is given for each stage.
 
 ---
 
@@ -99,6 +99,11 @@ with mode duty d_12L = n_12L/day · (t_cap + t_warm) / 86400, and similarly for 
   fits:  N_rep · b_feat + p_abn · L · B_comp
   doesn't fit:  L · B_comp, where B_comp = fs · b · T_cap / ρ (ρ = 4) [A-02]
 
+**4.3b Per-mode memory per lead**
+
+  store-then-decide: M_lead = T_win · fs · b (≈ T_win kB), divided by the buffer ratio, or by the lossless ratio when diag_lossless is on
+  streaming (BSPM): M_lead = M_stream ≈ 1.5 kB, independent of T_win [A-05, A-13, A-14]
+
 **4.4 Regime boundaries**
 
   Centralized fits:  S ≥ M_base + L_max · T / r
@@ -111,6 +116,15 @@ The winner is the architecture with the fewest SoCs whose L_max fits. This repro
   (n_SoC − 1) · (P_floor + P_leak·S) < E_bit · (R_stream − R_onbody)
 
 For continuous 12-lead this is about 19 µW per SoC against about 4.2 mW saved, so breakeven is around 220 extra SoCs.
+
+---
+
+## 4b. IO pads per chiplet (`geometry.py`) [H-15]
+
+  sensor chiplet:  P_IO = k_electrodes + 2 · (p_dedicated + min(p_mesh, 4))
+  orchestrator:    P_IO = 2 · (p_dedicated + min(p_mesh, 4))
+  centralized:     P_IO = N + 2, so it grows linearly with electrode count
+  feasible ⇔ P_IO ≤ chiplet_io_pads (THReaD ≈ 9)
 
 ---
 
