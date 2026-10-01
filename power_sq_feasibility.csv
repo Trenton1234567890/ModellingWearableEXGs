@@ -1,0 +1,15 @@
+m,scenario,power_uW,rej_12L,ok_12L,rej_RR,ok_RR,bspm_frac,ok_BSPM,analog_max_cm
+1,"baseline: 5 pF, 1% gain, timestamps",540,80.3,False,85.6,True,0.5,False,0
+1,"spec AFE: 2 pF, 0.1% gain, timestamps",540,92.0,True,97.1,True,1.0,True,0
+2,"baseline: 5 pF, 1% gain, timestamps",312,80.5,False,92.0,True,0.42,False,25
+2,"spec AFE: 2 pF, 0.1% gain, timestamps",312,90.7,True,96.7,True,0.97,True,25
+3,"baseline: 5 pF, 1% gain, timestamps",246,79.8,False,92.4,True,0.45,False,13
+3,"spec AFE: 2 pF, 0.1% gain, timestamps",246,87.9,False,98.3,True,0.97,True,13
+4,"baseline: 5 pF, 1% gain, timestamps",205,80.3,False,91.9,True,0.43,False,17
+4,"spec AFE: 2 pF, 0.1% gain, timestamps",205,91.0,True,97.1,True,0.93,False,17
+8,"baseline: 5 pF, 1% gain, timestamps",167,79.8,False,89.2,True,0.4,False,25
+8,"spec AFE: 2 pF, 0.1% gain, timestamps",167,88.2,False,93.0,True,0.93,False,25
+16,"baseline: 5 pF, 1% gain, timestamps",144,79.1,False,88.0,True,0.32,False,46
+16,"spec AFE: 2 pF, 0.1% gain, timestamps",144,85.8,False,91.0,True,0.9,False,46
+N,"baseline: 5 pF, 1% gain, timestamps",102,79.9,False,82.8,True,0.33,False,70
+N,"spec AFE: 2 pF, 0.1% gain, timestamps",102,82.0,False,84.6,True,0.58,False,70

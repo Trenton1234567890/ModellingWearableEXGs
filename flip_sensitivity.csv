@@ -1,0 +1,70 @@
+scenario,param,low,high,margin_low,margin_base,margin_high,span,flips
+A: cont12L @200 nJ/b,E_tx_ble,3.0,200.0,0.52,4.4,4.4,2.144071048140896,True
+A: cont12L @200 nJ/b,P_tx_floor,5.0,100.0,4.47,4.4,4.07,0.09315741683821921,False
+A: cont12L @200 nJ/b,sram_cap_kB,8.0,256.0,0.96,4.4,0.68,0.3474962493320332,True
+A: cont12L @200 nJ/b,sram_leak_uW_kB,0.02,1.0,4.7,4.4,2.57,0.6059949217730681,False
+A: cont12L @200 nJ/b,T_win_12L,2.0,30.0,0.85,4.4,0.96,0.11273096516141673,True
+A: cont12L @200 nJ/b,buf_ratio,1.0,3.0,4.4,4.4,6.23,0.34746931727618513,False
+A: cont12L @200 nJ/b,p_abnormal,0.01,0.5,5.31,4.4,1.51,1.2603546482109795,False
+A: cont12L @200 nJ/b,feat_bits_lead_12L,256.0,2048.0,4.8,4.4,2.95,0.4860907607603322,False
+A: cont12L @200 nJ/b,compress_ratio,2.0,8.0,7.15,4.4,2.54,1.0351081724728928,False
+A: cont12L @200 nJ/b,P_node_fixed,1.0,50.0,4.92,4.4,3.01,0.492019103671286,False
+A: cont12L @200 nJ/b,P_router_node,0.5,20.0,4.48,4.4,3.62,0.2139393006622079,False
+A: cont12L @200 nJ/b,P_node_off,0.1,5.0,4.43,4.4,4.15,0.06368246348625983,False
+A: cont12L @200 nJ/b,P_afe_diag,0.5,20.0,4.63,4.4,3.82,0.1919752852044303,False
+A: cont12L @200 nJ/b,P_afe_mon,0.5,20.0,4.4,4.4,4.4,0.0,False
+A: cont12L @200 nJ/b,W_lead,5000.0,100000.0,4.43,4.4,4.24,0.04364031808780844,False
+A: cont12L @200 nJ/b,eta_pmu,0.5,0.85,4.4,4.4,4.4,0.0,False
+A: cont12L @200 nJ/b,analysis_mem_base_kB,4.0,16.0,4.4,4.4,1.51,1.0717394227022101,False
+A: cont12L @200 nJ/b,yarn_C,30.0,150.0,4.43,4.4,4.37,0.013866566502575006,False
+A: cont12L @200 nJ/b,n_12lead_per_day,1.0,96.0,4.4,4.4,4.4,0.0,False
+A: cont12L @200 nJ/b,hr_hz,0.8,3.0,4.4,4.4,4.4,0.0,False
+A: cont12L @200 nJ/b,f_cap_MHz,1.0,50.0,4.4,4.4,4.4,0.0,False
+A: cont12L @200 nJ/b,lossless_ratio,1.5,3.0,4.4,4.4,4.4,0.0,False
+A: cont12L @200 nJ/b,orchestrator core floor,0.5,50.0,5.78,4.4,2.21,0.961040932846994,False
+B: cont12L @30 nJ/b,E_tx_ble,3.0,200.0,0.52,1.14,4.4,2.144071048140896,True
+B: cont12L @30 nJ/b,P_tx_floor,5.0,100.0,1.14,1.14,1.12,0.020168034254986686,False
+B: cont12L @30 nJ/b,sram_cap_kB,8.0,256.0,0.8,1.14,0.46,0.5563220633007288,True
+B: cont12L @30 nJ/b,sram_leak_uW_kB,0.02,1.0,1.25,1.14,0.89,0.33716149326332573,True
+B: cont12L @30 nJ/b,T_win_12L,2.0,30.0,0.59,1.14,0.8,0.29621162759029607,True
+B: cont12L @30 nJ/b,buf_ratio,1.0,3.0,1.14,1.14,2.0,0.5660792794022133,False
+B: cont12L @30 nJ/b,p_abnormal,0.01,0.5,1.18,1.14,0.9,0.27508039005186397,True
+B: cont12L @30 nJ/b,feat_bits_lead_12L,256.0,2048.0,1.16,1.14,1.02,0.12216054695716762,False
+B: cont12L @30 nJ/b,compress_ratio,2.0,8.0,1.99,1.14,0.83,0.8771559698526449,True
+B: cont12L @30 nJ/b,P_node_fixed,1.0,50.0,1.33,1.14,0.71,0.6259695563899581,True
+B: cont12L @30 nJ/b,P_router_node,0.5,20.0,1.17,1.14,0.86,0.3033313657022134,True
+B: cont12L @30 nJ/b,P_node_off,0.1,5.0,1.15,1.14,1.04,0.09264925516008651,False
+B: cont12L @30 nJ/b,P_afe_diag,0.5,20.0,1.16,1.14,1.08,0.06866166491468417,False
+B: cont12L @30 nJ/b,P_afe_mon,0.5,20.0,1.14,1.14,1.14,0.0,False
+B: cont12L @30 nJ/b,W_lead,5000.0,100000.0,1.14,1.14,1.13,0.009738140001207152,False
+B: cont12L @30 nJ/b,eta_pmu,0.5,0.85,1.14,1.14,1.14,0.0,False
+B: cont12L @30 nJ/b,analysis_mem_base_kB,4.0,16.0,1.14,1.14,0.8,0.3544768657368193,True
+B: cont12L @30 nJ/b,yarn_C,30.0,150.0,1.15,1.14,1.12,0.020409429378060562,False
+B: cont12L @30 nJ/b,n_12lead_per_day,1.0,96.0,1.14,1.14,1.14,0.0,False
+B: cont12L @30 nJ/b,hr_hz,0.8,3.0,1.14,1.14,1.14,0.0,False
+B: cont12L @30 nJ/b,f_cap_MHz,1.0,50.0,1.14,1.14,1.14,0.0,False
+B: cont12L @30 nJ/b,lossless_ratio,1.5,3.0,1.14,1.14,1.14,0.0,False
+B: cont12L @30 nJ/b,orchestrator core floor,0.5,50.0,1.73,1.14,0.84,0.723619456245914,True
+C: default schedule,E_tx_ble,3.0,200.0,0.49,0.6,0.6,0.19381545712485482,False
+C: default schedule,P_tx_floor,5.0,100.0,0.54,0.6,0.76,0.343472519941013,False
+C: default schedule,sram_cap_kB,8.0,256.0,0.6,0.6,0.48,0.22959021257397805,False
+C: default schedule,sram_leak_uW_kB,0.02,1.0,0.61,0.6,0.49,0.23443001919901252,False
+C: default schedule,T_win_12L,2.0,30.0,0.56,0.6,0.64,0.1363617894938779,False
+C: default schedule,buf_ratio,1.0,3.0,0.6,0.6,0.63,0.05302825315473697,False
+C: default schedule,p_abnormal,0.01,0.5,0.6,0.6,0.59,0.009101785956931563,False
+C: default schedule,feat_bits_lead_12L,256.0,2048.0,0.6,0.6,0.59,0.005003085262531348,False
+C: default schedule,compress_ratio,2.0,8.0,0.64,0.6,0.57,0.11964262315881202,False
+C: default schedule,P_node_fixed,1.0,50.0,0.62,0.6,0.55,0.11031485891352694,False
+C: default schedule,P_router_node,0.5,20.0,0.61,0.6,0.45,0.296010083326382,False
+C: default schedule,P_node_off,0.1,5.0,0.63,0.6,0.36,0.5526311033969193,False
+C: default schedule,P_afe_diag,0.5,20.0,0.59,0.6,0.6,0.007693471596773249,False
+C: default schedule,P_afe_mon,0.5,20.0,0.59,0.6,0.69,0.15668909343383453,False
+C: default schedule,W_lead,5000.0,100000.0,0.59,0.6,0.62,0.040520260837560385,False
+C: default schedule,eta_pmu,0.5,0.85,0.6,0.6,0.6,1.1102230246251565e-16,False
+C: default schedule,analysis_mem_base_kB,4.0,16.0,0.6,0.6,0.59,0.016150515832748735,False
+C: default schedule,yarn_C,30.0,150.0,0.6,0.6,0.59,0.002410906990921502,False
+C: default schedule,n_12lead_per_day,1.0,96.0,0.56,0.6,0.69,0.21183663951545906,False
+C: default schedule,hr_hz,0.8,3.0,0.58,0.6,0.65,0.1044840047673159,False
+C: default schedule,f_cap_MHz,1.0,50.0,0.6,0.6,0.6,0.0,False
+C: default schedule,lossless_ratio,1.5,3.0,0.6,0.6,0.6,0.0,False
+C: default schedule,orchestrator core floor,0.5,50.0,0.68,0.6,0.46,0.3790660551109122,False
