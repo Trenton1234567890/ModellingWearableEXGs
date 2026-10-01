@@ -12,6 +12,7 @@ The parameter values live in `ecg_arch_model/params.py`; this log records the re
 
 | Date | ID | Change |
 |---|---|---|
+| 2026-10-01 | A-10, A-11 | Added a lossless buffer-compression knob r (default 1, swept 1–3). Added the closed-form regime rule; it matches 220 of 220 sweep cells. |
 | 2026-10-01 | A-01 – A-09 | **On-garment processing added (user request).** Every architecture now uses the same export policy (raw, compressed or onbody). Whether a given orchestrator can do the analysis depends on per-chiplet SRAM (32 kB) and clock (4 MHz) caps; if it can't, that head falls back to compressed streaming. Lead assignment uses a WCT broadcast to area heads. Retained-SRAM leakage is added to every orchestrator floor. Two continuous schedules were added. |
 | 2026-10-01 | A-08 | **Bug fix.** Compressed and raw capture streams were previously transmitted during the 15 s warm-up as well as the capture, which inflated TX about 2.5× for captures. Battery TX in the default schedule drops from 87 to 62 µW; Stage 3 numbers were re-run. |
 | 2026-10-01 | X-06 | Superseded by A-01: export is now a policy shared by all architectures, not fixed per mode. |
@@ -189,6 +190,8 @@ The parameter values live in `ecg_arch_model/params.py`; this log records the re
 | A-06 | Abnormal-capture fraction p_abnormal = 5% (range 1–50%). | [decision] |
 | A-07 | Retained SRAM leakage is 0.1 µW/kB (range 0.02–1), added to every orchestrator floor as leakage × SRAM cap (3.2 µW at 32 kB). This value needs a citation. | [assumed] |
 | A-08 | Lead assignment for on-body analysis. Each independent lead goes to the head of the area holding its electrode. The 12-lead limb group (I and II buffered, the others derived) goes to the head holding RA. Heads other than RA's receive a WCT broadcast of RA, LA and LL (3 × fs × 16 b) over the inter-area links. Streams are counted only during the capture, not the warm-up. | [decision] |
+| A-10 | The analysis buffer can be compressed losslessly by r (default 1, range 1–3). Lossless ECG coders reach about 2–3×; this needs a citation. | [assumed] |
+| A-11 | Closed-form regime rule. A head holding L independent leads fits if M_base + L·T/r ≤ S. The winner is the fewest-SoC architecture whose largest per-head load L_max fits. If none fits but M_base + T/r ≤ S, the finest architecture wins by fitting partially. Otherwise everything streams and centralized wins. Checked against 220 of 220 cells for continuous 12-lead. | [derived] |
 | A-09 | Schedules. default: as in X-07. cont12L: 12-lead continuously, as back-to-back 10 s windows with no warm-up. contBSPM: BSPM continuously. | [decision] |
 
 ### V — Validation and publication
