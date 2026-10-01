@@ -74,6 +74,7 @@ ROWS = [
     ("f_cap_MHz", 4, 1, 50, "MHz", 3, "assumed", "per-chiplet clock cap for low-power operation (A-04)"),
     ("analysis_mem_kB_lead", 10, 2, 10, "kB/lead", 3, "decision", "10 s window x 500 S/s x 16 b per independent lead (A-05)"),
     ("analysis_mem_base_kB", 8, 4, 16, "kB", 3, "assumed", "program + state + fusion (A-05)"),
+    ("buf_ratio", 1.0, 1.0, 3.0, "-", 3, "assumed", "lossless compression of the analysis buffer; lossless ECG coders reach ~2-3x (citation needed) (A-10)"),
     ("p_abnormal", 0.05, 0.01, 0.5, "-", 3, "decision", "fraction of captures flagged abnormal and sent in full (compressed) (A-06)"),
     ("feat_bits_lead_12L", 512, 256, 2048, "bit/lead/capture", 3, "assumed", "32 measurements x 16 b per lead per 12-lead capture (A-06)"),
     ("template_s_bspm", 0.6, 0.4, 1.0, "s", 3, "assumed", "beat-averaged template length per BSPM lead (A-06)"),
